@@ -1,3 +1,43 @@
+# Process
+The entire process is split into data processing, model definition and training bbox, training segmentation
+### Data preparation
+The dataset is downloaded and we see that the folder structure is
+ -> Annotations
+ -> images
+ -> masks
+We write a script to create the bounding box from the mask. For this we take pytorch's standard module **from torchvision.ops import masks_to_boxes** and build on it. We also use assertion statements to check if shape of images and matching along with filename to avoid using auto image rotation using metadata opencv vs PIL issues. There are 
+potentially 3 types of classes in the segmentation
+* spallmask
+* rebarmask
+* crackmask
+
+These are loaded seperately as different masks then merged. The bouding box is obtained for each of these classes.
+While converting the entire thing to coco format is one approach another one is where the dataloader matches the output
+We see for detr bbox following are the input types
+```
+{'area': tensor([[141581.2188]]),
+ 'boxes': tensor([[[0.3353, 0.5104, 0.6706, 0.4080]]]),
+ 'image_id': tensor([[3174]]),
+ 'iscrowd': tensor([[False]]),
+ 'labels': tensor([[1]]),
+ 'orig_size': tensor([[570, 756]]),
+ 'size': tensor([[704, 735]])}
+```
+And output from ourdata loader is 
+```
+{'boxes': tensor([[[  0.,   0., 185., 254.],
+          [  0.,   0., 185., 254.],
+          [  0.,   0., 185., 254.]]]),
+ 'labels': tensor([[1, 1, 1]])}
+```
+## TODO
+Check why sometimes bounding box is not visible. Multiple classes issue
+### Model
+A pretrained detr model will be used and transfer learning with low lr will be utilized to train the model on custom dataset.
+
+
+
+
 **We take the encoded image (dxH/32xW/32) and send it to Multi-Head Attention (FROM WHERE DO WE TAKE THIS ENCODED IMAGE?)**
 
 This encoded image is taken from the output of the res-net Backbone after passing through a 1x1 convolutional network. The input image in this case is 3xWxH. The backbone activation map output is CxH/32x/32 this is passed through a 1x1 network and we get **dxH/32xW/32.** The section of the code that does this is
@@ -80,3 +120,4 @@ def forward(self, x: Tensor, bbox_mask: Tensor, fpns: List[Tensor]):
 We use an FPN style CNN. We interpolate the inputs to the layer while passing through the FPN adapter layers and a pixel wise argmax (sigmoid with a threshold) is used to obtain the final output.
 
 The final panoptic segmentation postprocessing code identifies each thing and stuff class and their ids and merges them into one single image.
+
