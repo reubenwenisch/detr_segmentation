@@ -34,6 +34,16 @@ CLASSES = [
 COLORS = [[0.000, 0.447, 0.741], [0.850, 0.325, 0.098], [0.929, 0.694, 0.125],
           [0.494, 0.184, 0.556], [0.466, 0.674, 0.188], [0.301, 0.745, 0.933]]
 
+import albumentations as A
+import cv2
+
+# Add transforms in the code later
+transform = A.Compose([
+    # A.RandomCrop(width=450, height=450),
+    A.HorizontalFlip(p=0.5),
+    A.RandomBrightnessContrast(p=0.2),
+], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['category_ids']))
+
 def img2bbox(file):
     img = cv2.imread(file,0)
     ret,thresh = cv2.threshold(img,127,255,0)

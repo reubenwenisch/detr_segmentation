@@ -18,6 +18,8 @@ from models import build_model
 from masks import SegmentationToDetectionDataset
 from torch.utils.data import random_split
 
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
 def get_args_parser():
     parser = argparse.ArgumentParser('Set transformer detector', add_help=False)
     parser.add_argument('--lr', default=1e-4, type=float)
@@ -56,6 +58,8 @@ def get_args_parser():
     parser.add_argument('--num_queries', default=100, type=int,
                         help="Number of query slots")
     parser.add_argument('--pre_norm', action='store_true')
+    parser.add_argument('--num_classes', default=1, type=int,
+                        help="Number of classes")
 
     # * Segmentation
     parser.add_argument('--masks', action='store_true',
@@ -81,13 +85,14 @@ def get_args_parser():
 
     # dataset parameters
     parser.add_argument('--dataset_file', default='coco')
-    parser.add_argument('--coco_path', type=str)
+    parser.add_argument('--transform')
+    # parser.add_argument('--coco_path', type=str)
     parser.add_argument('--coco_panoptic_path', type=str)
     parser.add_argument('--remove_difficult', action='store_true')
 
     parser.add_argument('--output_dir', default='',
                         help='path where to save, empty for no saving')
-    parser.add_argument('--device', default='cuda',
+    parser.add_argument('--device', default=device,
                         help='device to use for training / testing')
     parser.add_argument('--seed', default=42, type=int)
     parser.add_argument('--resume', default='', help='resume from checkpoint')
@@ -105,6 +110,7 @@ def get_args_parser():
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
     return parser
 
+from masks import transform
 
 def main(args):
     utils.init_distributed_mode(args)
@@ -146,7 +152,8 @@ def main(args):
     # dataset_train = build_dataset(image_set='train', args=args)
     # dataset_val = build_dataset(image_set='val', args=args)
     dataset = SegmentationToDetectionDataset(args.data_path, transforms=args.transform)
-    dataset_train, dataset_val = random_split(dataset, (0.8*len(dataset), 0.2*len(dataset)))
+    train_len = int(0.8*len(dataset))
+    dataset_train, dataset_val = random_split(dataset, [train_len , len(dataset)-train_len])
     # dataset_val = SegmentationToDetectionDataset(args.val_path, transforms=args.transform)
 
     if args.distributed:
@@ -182,7 +189,8 @@ def main(args):
                 args.resume, map_location='cpu', check_hash=True)
         else:
             checkpoint = torch.load(args.resume, map_location='cpu')
-        model_without_ddp.load_state_dict(checkpoint['model'])
+
+        model_without_ddp.load_state_dict(checkpoint['model'], strict = False)
         if not args.eval and 'optimizer' in checkpoint and 'lr_scheduler' in checkpoint and 'epoch' in checkpoint:
             optimizer.load_state_dict(checkpoint['optimizer'])
             lr_scheduler.load_state_dict(checkpoint['lr_scheduler'])
