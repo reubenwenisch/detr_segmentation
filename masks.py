@@ -137,6 +137,90 @@ class SegmentationToDetectionDataset(torch.utils.data.Dataset):
 
         return img, target
 
+class SegmentationToDetectionDataset_CV2(torch.utils.data.Dataset):
+    def __init__(self, root, transforms):
+        self.root = root
+        self.transforms = transforms
+        # load all image files, sorting them to
+        # ensure that they are aligned
+        self.imgs = list(sorted(os.listdir(os.path.join(root, "images"))))
+        self.idx_to_class = {
+                            0: "rebar",
+                            1: "spall",
+                            2: "crack",
+                        }
+    def __len__(self):
+        self.filelength = len(self.imgs)
+        return self.filelength
+
+    def __getitem__(self, idx):
+        # load images and masks
+        img_path = os.path.join(self.root, "images", self.imgs[idx])
+        img = read_image(img_path)
+        file = self.imgs[idx]
+        filename = os.path.splitext(file)[0]
+        # mask_path = os.path.join(self.root, "masks", self.masks[idx])
+        spallmask_file = os.path.join(self.root, "masks", filename + 'spall' + '.jpg')
+        rebarmask_file = os.path.join(self.root, "masks",filename + 'rebar' + '.jpg')
+        crackmask_file = os.path.join(self.root, "masks", filename + 'crack' + '.jpg')    
+        mask1 = torch.zeros_like(img)
+        mask2 = torch.zeros_like(img)
+        mask3 = torch.zeros_like(img)
+        boxes = []
+        labels = []
+        if os.path.exists(rebarmask_file):
+            mask1 = cv2.imread(rebarmask_file,0)
+            ret,thresh = cv2.threshold(mask1,127,255,0)
+            contours,hierarchy = cv2.findContours(thresh, 1, 2)
+            for cnt in contours:
+                x,y,w,h = cv2.boundingRect(cnt)
+                boxes.append(torch.tensor([x,y,w,h]))
+                labels.append(torch.tensor(0))
+        if os.path.exists(spallmask_file):
+            mask2 = cv2.imread(spallmask_file,0)
+            ret,thresh = cv2.threshold(mask2,127,255,0)
+            contours,hierarchy = cv2.findContours(thresh, 1, 2)
+            for cnt in contours:
+                x,y,w,h = cv2.boundingRect(cnt)
+                boxes.append(torch.tensor([x,y,w,h]))
+                labels.append(torch.tensor(1))
+        if os.path.exists(crackmask_file):
+            mask3 = cv2.imread(crackmask_file,0)
+            ret,thresh = cv2.threshold(mask3,127,255,0)
+            contours,hierarchy = cv2.findContours(thresh, 1, 2)
+            for cnt in contours:
+                x,y,w,h = cv2.boundingRect(cnt)
+                boxes.append(torch.tensor([x,y,w,h]))
+                labels.append(torch.tensor(2))
+        img = F.convert_image_dtype(img, dtype=torch.float)
+        # mask = F.convert_image_dtype(mask, dtype=torch.float)
+        c, h, w = img.shape
+
+        for i, box in enumerate(boxes):
+            x,y,w,h = normalize_bbox(box,img.shape[1], img.shape[2])
+            boxes[i] = torch.tensor([x,y,w,h])
+        # print("boxes before A", boxes)
+        # there is only one class
+        # labels = torch.ones((mask.shape[0],), dtype=torch.int64)
+
+        target = {}
+        # target["boxes"] = normalize_bbox(boxes, h, w)
+        target["boxes"] = boxes
+        target["labels"] = torch.stack(labels)
+
+        # if self.transforms is not None:
+        #     transformed = self.transforms(image=img.numpy(), bboxes=target["boxes"], category_ids=labels)
+        #     img = torch.tensor(transformed['image']) #.permute(2,0,1)
+        #     target["boxes"] = transformed['bboxes']
+            # target["boxes"] = _box_convert._box_xyxy_to_xywh(transformed['bboxes'])
+        for i, box in enumerate(target["boxes"]):
+            x,y,w,h = box
+            target["boxes"][i] = torch.tensor([x,y,w,h])
+        target["boxes"] = torch.stack(target["boxes"])
+        # print("boxes after A", target["boxes"])
+        return img, target
+
+
 import matplotlib.pyplot as plt
 
 def show(imgs):
