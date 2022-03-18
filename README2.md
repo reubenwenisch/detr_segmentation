@@ -30,14 +30,20 @@ And output from ourdata loader is
           [  0.,   0., 185., 254.]]]),
  'labels': tensor([[1, 1, 1]])}
 ```
-## TODO
-Check why sometimes bounding box is not visible. Multiple classes issue
+
 ### Model
-A pretrained detr model will be used and transfer learning with low lr will be utilized to train the model on custom dataset.
+A pretrained detr model will be used and transfer learning with low lr will be utilized to train the model on custom dataset. For transfer learning two parameters are deleted in the checkpoint weights.
+```
+del checkpoint["model"]["class_embed.weight"]
+del checkpoint["model"]["class_embed.bias"]
+del checkpoint["model"]["query_embed.weight"]
+```
+The number of class is chaged and the checkpoint weights are loaded. The standard script is used of training.
 
+# TODO
+Resize operation needs to be fixed with albumentations.
 
-
-
+## Questions
 **We take the encoded image (dxH/32xW/32) and send it to Multi-Head Attention (FROM WHERE DO WE TAKE THIS ENCODED IMAGE?)**
 
 This encoded image is taken from the output of the res-net Backbone after passing through a 1x1 convolutional network. The input image in this case is 3xWxH. The backbone activation map output is CxH/32x/32 this is passed through a 1x1 network and we get **dxH/32xW/32.** The section of the code that does this is

@@ -40,9 +40,9 @@ import cv2
 # Add transforms in the code later
 transform = A.Compose([
     # A.RandomCrop(width=450, height=450),
-    A.HorizontalFlip(p=0.5),
+    # A.HorizontalFlip(p=0.5),
     A.RandomBrightnessContrast(p=0.2),
-], bbox_params=A.BboxParams(format='pascal_voc', label_fields=['category_ids']))
+], bbox_params=A.BboxParams(format='albumentations', label_fields=['category_ids']))
 
 def img2bbox(file):
     img = cv2.imread(file,0)
