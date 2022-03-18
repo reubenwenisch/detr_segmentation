@@ -207,7 +207,7 @@ class SegmentationToDetectionDataset_CV2(torch.utils.data.Dataset):
 
         target = {}
         # target["boxes"] = normalize_bbox(boxes, h, w)
-        print("boxes before transform", boxes)
+        # print("boxes before transform", boxes)
         target["boxes"] = torch.stack(boxes)
         target["labels"] = torch.stack(labels)
 
@@ -219,7 +219,7 @@ class SegmentationToDetectionDataset_CV2(torch.utils.data.Dataset):
         for i, box in enumerate(target["boxes"]):
             x1,y1,x2,y2 = box
             target["boxes"][i] = torch.tensor([x1,y1,x2,y2])
-        print("boxes after transform", boxes)
+        # print("boxes after transform", boxes)
         # target["boxes"] = torch.stack(target["boxes"])
         # print("boxes after A", target["boxes"])
         return img, target
