@@ -197,29 +197,32 @@ class SegmentationToDetectionDataset_CV2(torch.utils.data.Dataset):
         c, h, w = img.shape
 
         for i, box in enumerate(boxes):
-            x,y,w,h = normalize_bbox(box,img.shape[1], img.shape[2])
-            boxes[i] = torch.tensor([x,y,w,h])
+            box = _box_convert._box_xywh_to_xyxy(box)
+            x1,y1,x2,y2 = normalize_bbox(box,img.shape[1], img.shape[2]) #`(x_min, y_min, x_max, y_max)`.
+            boxes[i] = torch.tensor([x1,y1,x2,y2])
+            
         # print("boxes before A", boxes)
         # there is only one class
         # labels = torch.ones((mask.shape[0],), dtype=torch.int64)
 
         target = {}
         # target["boxes"] = normalize_bbox(boxes, h, w)
-        target["boxes"] = boxes
+        print("boxes before transform", boxes)
+        target["boxes"] = torch.stack(boxes)
         target["labels"] = torch.stack(labels)
 
-        # if self.transforms is not None:
-        #     transformed = self.transforms(image=img.numpy(), bboxes=target["boxes"], category_ids=labels)
-        #     img = torch.tensor(transformed['image']) #.permute(2,0,1)
-        #     target["boxes"] = transformed['bboxes']
+        if self.transforms is not None:
+            transformed = self.transforms(image=img.numpy(), bboxes=target["boxes"].numpy(), category_ids=labels)
+            img = torch.tensor(transformed['image']) #.permute(2,0,1)
+            target["boxes"] = torch.tensor(transformed['bboxes'])
             # target["boxes"] = _box_convert._box_xyxy_to_xywh(transformed['bboxes'])
         for i, box in enumerate(target["boxes"]):
-            x,y,w,h = box
-            target["boxes"][i] = torch.tensor([x,y,w,h])
-        target["boxes"] = torch.stack(target["boxes"])
+            x1,y1,x2,y2 = box
+            target["boxes"][i] = torch.tensor([x1,y1,x2,y2])
+        print("boxes after transform", boxes)
+        # target["boxes"] = torch.stack(target["boxes"])
         # print("boxes after A", target["boxes"])
         return img, target
-
 
 import matplotlib.pyplot as plt
 
