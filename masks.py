@@ -246,7 +246,7 @@ class SegmentationToDetectionDataset_Seg(torch.utils.data.Dataset):
                             1: "spall",
                             2: "crack",
                         }
-    def __len__(self)
+    def __len__(self):
         self.filelength = len(self.imgs)
         return self.filelength
 
