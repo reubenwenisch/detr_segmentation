@@ -246,7 +246,7 @@ class SegmentationToDetectionDataset_Seg(torch.utils.data.Dataset):
                             1: "spall",
                             2: "crack",
                         }
-    def __len__(self):
+    def __len__(self)
         self.filelength = len(self.imgs)
         return self.filelength
 
@@ -312,6 +312,7 @@ class SegmentationToDetectionDataset_Seg(torch.utils.data.Dataset):
         target["labels"] = torch.stack(labels)
         target["orig_size"] = torch.as_tensor([int(row), int(col)])
         target["size"] = torch.as_tensor([int(row), int(col)])
+        target["image_id"] = self.ids[idx]
 
         for i, box in enumerate(target["boxes"]):
             x1,y1,x2,y2 = box
