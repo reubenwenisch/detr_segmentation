@@ -312,7 +312,7 @@ class SegmentationToDetectionDataset_Seg(torch.utils.data.Dataset):
         target["labels"] = torch.stack(labels)
         target["orig_size"] = torch.as_tensor([int(row), int(col)])
         target["size"] = torch.as_tensor([int(row), int(col)])
-        target["image_id"] = torch.tensor(int(filename))
+        target["image_id"] = torch.tensor(int(''.join(e for e in filename if e.isalnum())))
 
         for i, box in enumerate(target["boxes"]):
             x1,y1,x2,y2 = box
