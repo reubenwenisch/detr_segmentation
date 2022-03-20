@@ -41,7 +41,7 @@ import cv2
 transform = A.Compose([
     # A.RandomCrop(width=450, height=450),
     A.LongestMaxSize(max_size=1333),
-    A.HorizontalFlip(p=1.0),
+    A.HorizontalFlip(p=0.5),
     A.RandomBrightnessContrast(p=0.2),
 ]) #, bbox_params=A.BboxParams(format='albumentations', label_fields=['category_ids']))
 
