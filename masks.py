@@ -258,7 +258,7 @@ class SegmentationToDetectionDataset_Seg(torch.utils.data.Dataset):
         file = self.imgs[idx]
         filename = os.path.splitext(file)[0]
         # mask_path = os.path.join(self.root, "masks", self.masks[idx])
-        figure, ax = plt.subplots(nrows=2, ncols=2, figsize=(2, 2))
+        # figure, ax = plt.subplots(nrows=2, ncols=2, figsize=(2, 2))
         spallmask_file = os.path.join(self.root, "masks", filename + 'spall' + '.jpg')
         rebarmask_file = os.path.join(self.root, "masks",filename + 'rebar' + '.jpg')
         crackmask_file = os.path.join(self.root, "masks", filename + 'crack' + '.jpg')    
@@ -277,7 +277,7 @@ class SegmentationToDetectionDataset_Seg(torch.utils.data.Dataset):
             mask3 = cv2.imread(crackmask_file)
             # print("mask3 shape",mask3.shape)
         masks = [mask1, mask2, mask3]
-        ax[0, 0].imshow(img)
+        # ax[0, 0].imshow(img)
         # ax[0, 1].imshow(mask1)
         # ax[0, 2].imshow(mask2)
         # ax[0, 3].imshow(mask3)
@@ -292,7 +292,7 @@ class SegmentationToDetectionDataset_Seg(torch.utils.data.Dataset):
             mask3 = transform(image=mask3)['image']
             # transformed_mask = transformed['mask']
             # mask1, mask2, mask3 = transformed_mask
-        ax[0, 1].imshow(transformed_image)
+            # ax[0, 1].imshow(transformed_image)
         # ax[1, 1].imshow(mask1)
         # ax[1, 2].imshow(mask2)
         # ax[1, 3].imshow(mask3)
