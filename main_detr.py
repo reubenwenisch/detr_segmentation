@@ -18,6 +18,7 @@ from models import build_model
 from masks import SegmentationToDetectionDataset_Seg
 from torch.utils.data import random_split
 
+from masks import transformations
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 def get_args_parser():
@@ -85,7 +86,7 @@ def get_args_parser():
 
     # dataset parameters
     parser.add_argument('--dataset_file', default='coco')
-    parser.add_argument('--transform')
+    parser.add_argument('--transform', default=transformations )
     # parser.add_argument('--coco_path', type=str)
     parser.add_argument('--coco_panoptic_path', type=str)
     parser.add_argument('--remove_difficult', action='store_true')

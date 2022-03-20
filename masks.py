@@ -38,7 +38,7 @@ import albumentations as A
 import cv2
 
 # Add transforms in the code later
-transform = A.Compose([
+transformations = A.Compose([
     # A.RandomCrop(width=450, height=450),
     A.LongestMaxSize(max_size=1333),
     # A.HorizontalFlip(p=0.5),
