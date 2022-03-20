@@ -241,6 +241,7 @@ class SegmentationToDetectionDataset_Seg(torch.utils.data.Dataset):
         # load all image files, sorting them to
         # ensure that they are aligned
         self.imgs = list(sorted(os.listdir(os.path.join(root, "images"))))
+        self.dataset['images'] = self.imgs
         self.idx_to_class = {
                             0: "rebar",
                             1: "spall",
