@@ -285,11 +285,11 @@ class SegmentationToDetectionDataset_Seg(torch.utils.data.Dataset):
         # print(type(masks))
         if self.transforms is not None:
             # transformed = transform(image=img, mask=np.array(masks))
-            transformed_image = transform(image=image)['image']
+            transformed_image = self.transforms(image=image)['image']
             # transformed_image = torch.tensor(transformed['image'])
-            mask1 = transform(image=mask1)['image']
-            mask2 = transform(image=mask2)['image']
-            mask3 = transform(image=mask3)['image']
+            mask1 = self.transforms(image=mask1)['image']
+            mask2 = self.transforms(image=mask2)['image']
+            mask3 = self.transforms(image=mask3)['image']
             # transformed_mask = transformed['mask']
             # mask1, mask2, mask3 = transformed_mask
             # ax[0, 1].imshow(transformed_image)
