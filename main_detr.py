@@ -15,7 +15,7 @@ import util.misc as utils
 from datasets import build_dataset, get_coco_api_from_dataset
 from engine import evaluate, train_one_epoch
 from models import build_model
-from masks import SegmentationToDetectionDataset_CV2
+from masks import SegmentationToDetectionDataset_Seg
 from torch.utils.data import random_split
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -151,7 +151,7 @@ def main(args):
 
     # dataset_train = build_dataset(image_set='train', args=args)
     # dataset_val = build_dataset(image_set='val', args=args)
-    dataset = SegmentationToDetectionDataset_CV2(args.data_path, transforms=args.transform)
+    dataset = SegmentationToDetectionDataset_Seg(args.data_path, transforms=args.transform)
     train_len = int(0.8*len(dataset))
     dataset_train, dataset_val = random_split(dataset, [train_len , len(dataset)-train_len])
     # dataset_val = SegmentationToDetectionDataset(args.val_path, transforms=args.transform)
