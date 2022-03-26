@@ -30,7 +30,8 @@ And output from ourdata loader is
           [  0.,   0., 185., 254.]]]),
  'labels': tensor([[1, 1, 1]])}
 ```
-
+#### Data Split
+The data is split using coco split repo https://github.com/akarazniewicz/cocosplit with 80% train and 20% for test.
 ### Model
 A pretrained detr model will be used and transfer learning with low lr will be utilized to train the model on custom dataset. For transfer learning two parameters are deleted in the checkpoint weights.
 ```
